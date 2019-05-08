@@ -1,6 +1,5 @@
 // 画像の変数
 var lakeImage;
-var lakeImage2;
 var moonImage;
 
 // サウンドの変数
@@ -12,39 +11,44 @@ var fireworks = [];
 var particles = [];
 var lastParticles = [];
 
-// 花火で描画する線
-// var oneLine = [];
 // 花火の粒子数
 var fireLength;
 
 // 初期化が完了しているか
 var isInitFinish;
 
-
-// --- 画像データからターゲット位置作成 ---
+// 画像データからターゲット位置作成
 var photoImage;
 
 var count = 0;
 var stepSize = 5;
 
 var positions = [];
-
 var judge = 0;
+
+// ---Timer---
+var timer;
+var counter = 0;
+var seconds, minutes;
+
+var launch;
+
 
 // データのロード
 function preload() {
-//  lakeImage = loadImage('lake.png');
-//  lakeImage2 = loadImage('lake2.png');
-
-//  moonImage = loadImage('moon.png');
+  
   launchSound = loadSound ('launch.mp3');
   explodeSound = loadSound ('explode.mp3');
   
   photoImage = loadImage('logo.png');
   
+  lakeImage = loadImage('lake.png');
+  moonImage = loadImage('moon.png');
+  
 //  temp3Image = loadImage('reiwa.png')
   
   isInitFinish = false;
+  launch = false;
 }
 
 // 座標探索
@@ -64,7 +68,6 @@ function dot() {
       {
         positions.push(createVector(x,y)); 
       }
-      
     }
   }
 }
@@ -73,25 +76,38 @@ function setup() {
   
   createCanvas(1100, 750);
   noStroke();
-  
-  /*
-  for (var i = 0; i < fireLength; i++)
-  {
-    var line = createVector(150 + i*10 , 275);
-    oneLine.push(line);
-  }
-  */
-  
-  // --- 読み込んだ画像の座標位置を補足 ---
+      
+  // 読み込んだ画像の座標位置を補足
   photoImage.loadPixels();
   dot();
   fireLength = positions.length;
 
+  // 初期化完了
   isInitFinish = true;
+  
+  // timer処理
+  timer = createP("timer");
+  setInterval(timeIt, 1000);
+}
+
+function timeIt() {
+  // 1 counter = 1 second
+  counter++ ;
+  
+  // 表示確認用
+	minutes = floor(counter/60);
+  seconds = counter % 60;
+    
+  timer.html(minutes + ":" + seconds);
 }
 
 
 function draw() {
+  
+  if(count%5==0){
+    launch = true;
+    print("ここ");
+  }
   
   if (isInitFinish)
   {
@@ -100,12 +116,9 @@ function draw() {
     background(0, 0, 20, 10);
     
     
-    // 月と湖を表示
-//    image(moonImage, 120, 50);
-//    image(lakeImage, 0, height - 100);
-//    image(lakeImage2, 800, height - 100);
-
-    
+    image(moonImage, 120, 50);
+    image(lakeImage, 0, height - 293);
+        
     // --- デバッグ描画 ---
     /*
     fill(255);
@@ -114,11 +127,11 @@ function draw() {
     }
     */
     
-    
     // たまに花火を打ち上げる（1000回のうち6回の確率）
-    if (random(1000) < 1) {
+    if (random(1000)<3) {
         // 花火クラスからnewで花火を新しく作って配列に追加する
         fireworks.push(new Firework());
+        launch = false;
     }
     
     // 花火の本体の数だけ処理する
@@ -159,13 +172,12 @@ function draw() {
         // 花火の粒が消える時間になったら
         if (lastParticles[i].lifetime < 0) {
             // 花火の粒を配列から消す
-             lastParticles.splice(i, 1);
-            print("kill you");
+            lastParticles.splice(i, 1);
         }
     }
     
   }
-
+  
 }
 
 // 花火の本体のクラス
@@ -173,7 +185,7 @@ class Firework {
     // 初期化（constructor＝コンストラクター＝建設者）
     constructor() {
         // 打ち上がり始める座標をランダムに決める
-        this.position = createVector(random(width), height - 100);
+        this.position = createVector(random(width)/2, height - 100);
         // 打ち上げる速度をランダムに決める
         this.velocityY = random(-4.0, -4.8);
         // 色をランダムに決める
@@ -267,7 +279,7 @@ class Particle {
        var diffLength = vec2target.mag();
             
         // --- 目的地に向かう ---
-        //!  目的地に到達したら
+        //  目的地に到達したら
         if (diffLength < 10.0)
         {
           var size = random(1.0, 2.0);
