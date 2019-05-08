@@ -21,7 +21,7 @@ var isInitFinish;
 var photoImage;
 
 var count = 0;
-var stepSize = 5;
+var stepSize = 8;
 
 var positions = [];
 var judge = 0;
@@ -128,7 +128,7 @@ function draw() {
     */
     
     // たまに花火を打ち上げる（1000回のうち6回の確率）
-    if (random(1000)<3) {
+    if (random(1000)<1) {
         // 花火クラスからnewで花火を新しく作って配列に追加する
         fireworks.push(new Firework());
         launch = false;
@@ -185,7 +185,7 @@ class Firework {
     // 初期化（constructor＝コンストラクター＝建設者）
     constructor() {
         // 打ち上がり始める座標をランダムに決める
-        this.position = createVector(random(width)/2, height - 100);
+        this.position = createVector(random(width), height - 100);
         // 打ち上げる速度をランダムに決める
         this.velocityY = random(-4.0, -4.8);
         // 色をランダムに決める
