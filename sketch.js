@@ -2,7 +2,8 @@
 var lakeImage;
 var moonImage;
 
-// サウンドの変数
+// TODO サウンドの変数
+// 爆発音のみでOK
 var launchSound;
 var explodeSound;
 
@@ -13,26 +14,46 @@ var lastParticles = [];
 
 // 花火の粒子数
 var fireLength;
+var fireLength2;
+var fireLength3;
+
+var fireLengthArray = [];
 
 // 初期化が完了しているか
 var isInitFinish;
 
 // 画像データからターゲット位置作成
 var photoImage;
+var photoImage2;
+var photoImage3;
 
+// タイマー用変数
 var count = 0;
-var stepSize = 6;
 
+// TODO 画像によってstepSizeを変更する
+//var stepSize = 12;
+//var stepSize2 = 12;
+//var stepSize3 = 12;
+
+// 目的地の座標
 var positions = [];
-var judge = 0;
+var positions2 = [];
+var positions3 = [];
+
+var positionsArray = [];
 
 // ---Timer---
 var timer;
 var counter = 0;
 var seconds, minutes;
 
+// TODO 削除予定
 var launch;
 
+// index変数
+var i = 0;
+// どのボタンがクリックされたか
+var judge = 0;
 
 // データのロード
 function preload() {
@@ -40,20 +61,24 @@ function preload() {
   launchSound = loadSound ('launch.mp3');
   explodeSound = loadSound ('explode.mp3');
   
-  photoImage = loadImage('logo.png');
-  
   lakeImage = loadImage('lake.png');
   moonImage = loadImage('moon.png');
   
-//  temp3Image = loadImage('reiwa.png')
-  
+  photoImage = loadImage('reiwa.png');
+  photoImage2 = loadImage('logo.png');
+  photoImage3 = loadImage('clark.png');
+
   isInitFinish = false;
   launch = false;
+  
+  positionsArray.push(positions);
+  positionsArray.push(positions2);
+  positionsArray.push(positions3);
 }
 
 // 座標探索
-function dot() {
-  
+function dot(photoImage,stepSize) {
+
   var pixels = photoImage.pixels;
   for (var y = 0; y < photoImage.height; y += stepSize) {
     for (var x = 0; x < photoImage.width; x += stepSize) {
@@ -66,30 +91,13 @@ function dot() {
       
       if (red == 0 && green == 0 && blue == 0) 
       {
-        positions.push(createVector(x,y)); 
+        positionsArray[index].push(createVector(x,y)); 
       }
     }
   }
 }
 
-function setup() {
-  
-  createCanvas(1100, 750);
-  noStroke();
-      
-  // 読み込んだ画像の座標位置を補足
-  photoImage.loadPixels();
-  dot();
-  fireLength = positions.length;
-
-  // 初期化完了
-  isInitFinish = true;
-  
-  // timer処理
-  timer = createP("timer");
-  setInterval(timeIt, 1000);
-}
-
+// タイマー用関数
 function timeIt() {
   // 1 counter = 1 second
   counter++ ;
@@ -102,36 +110,108 @@ function timeIt() {
 }
 
 
+function setup() {
+  
+  createCanvas(1100, 750);
+  noStroke();
+  
+  index = 0;
+  
+  // 画像によってstepSizeを変更する
+  var stepSize = 12; // 令和
+  var stepSize2 = 8; // life is tech !
+  var stepSize3 = 4; // クラークロゴ
+  
+  // 読み込んだ画像の座標位置を補足
+  // 0番目
+  photoImage.loadPixels();
+  dot(photoImage,stepSize);
+  fireLength = positions.length;
+  
+  fireLengthArray.push(fireLength);
+
+  index++;
+  print(fireLength);
+  
+  // 1番目
+  photoImage2.loadPixels();
+  dot(photoImage2,stepSize2);
+  fireLength2 = positions2.length;
+  
+  fireLengthArray.push(fireLength2);
+
+  index++;
+  print(fireLength2);
+  
+  // 2番目
+  photoImage3.loadPixels();
+  dot(photoImage3,stepSize3);
+  fireLength3 = positions3.length;
+  
+  print(fireLength3);
+  
+  fireLengthArray.push(fireLength3);
+
+  // 初期化完了
+  isInitFinish = true;
+  
+  // timer処理(確認用)
+  timer = createP("timer");
+  setInterval(timeIt, 1000);
+}
+
 function draw() {
   
+  // 初期化が完了次第動作
   if (isInitFinish)
   {
-  
     // 暗い背景を描く
     background(0, 0, 20, 10);
     
-    
+    // 背景のセット
     image(moonImage, 120, 50);
     image(lakeImage, 0, height - 293);
         
     // --- デバッグ描画 ---
-    /*
-    fill(255);
-    for(var i = 0; i < positions.length; i++){
-      ellipse(positions[i].x,positions[i].y,1);
-    }
-    */
+    // positionのインデックスを変更し，確認
     
-    // たまに花火を打ち上げる（1000回のうち6回の確率）
+    /*
+    
+    fill(255);
+    var temp = [];
+    temp = positionsArray[1];
+    for(var i = 0; i < temp.length; i++){
+      ellipse(temp[i].x,temp[i].y,1);
+    }
+    
+    */
+     
     if(!launch){
-      if (random(1000) < 6) {
+      // [R]をクリック
+      if (keyIsDown(82)) {
         // 花火クラスからnewで花火を新しく作って配列に追加する
+        judge = 0;
+        fireworks.push(new Firework());
+        launch = true;
+      }
+      
+      // [L]をクリック
+      if (keyIsDown(76)) {
+        // 花火クラスからnewで花火を新しく作って配列に追加する
+        judge = 1;
+        fireworks.push(new Firework());
+        launch = true;
+      }
+      
+      // [C]をクリック
+      if (keyIsDown(67)) {
+        // 花火クラスからnewで花火を新しく作って配列に追加する
+        judge = 2;
         fireworks.push(new Firework());
         launch = true;
       }
     }
 
-    
     // 花火の本体の数だけ処理する
     for (var i = 0; i < fireworks.length; i++) {
         // 花火本体を移動させる
@@ -172,10 +252,8 @@ function draw() {
             // 花火の粒を配列から消す
             lastParticles.splice(i, 1);
         }
-    }
-    
+    } 
   }
-  
 }
 
 // 花火の本体のクラス
@@ -183,9 +261,17 @@ class Firework {
     // 初期化（constructor＝コンストラクター＝建設者）
     constructor() {
         // 打ち上がり始める座標をランダムに決める
-        this.position = createVector(width -10, height - 100);
+        if(judge == 0){
+          this.position = createVector(width, 100);
+        }else if(judge == 1){
+          this.position = createVector(width, 300);
+        }else if(judge == 2){
+          this.position = createVector(width, 500);
+        }
+
         // 打ち上げる速度をランダムに決める
-        this.velocityY = random(-4.0, -4.8);
+        // 花火の遺産/ほとんど停止させてる
+        this.velocityY = random(-0.1, -0.2);
         // 色をランダムに決める
         this.color = color(random(200, 255), random(150, 255), random(100, 255));
         // モードを「move」にしておく
@@ -196,7 +282,7 @@ class Firework {
         // 打ち上げの音のボリュームを調整
         launchSound.setVolume(0.05);
         // 打ち上げの音を鳴らす（launch＝ローンチ＝打ち上げ）
-        launchSound.play();
+//        launchSound.play();
     }
     
     // 移動
@@ -220,13 +306,13 @@ class Firework {
         // モードを「explode」に変える
         this.mode = 'explode';
         launch = false;
+
         
-
-
         // 花火の大きさ（爆発の強さ）をランダムで決める
         var size = random(3.0, 6.0);
         // 花火の粒を大量に作る
-        for (var i = 0; i < fireLength; i++) {
+        var tempFireLength = fireLengthArray[judge];
+        for (var i = 0; i < tempFireLength; i++) {
             // 花火本体の座標と色を使って花火の粒を作り配列に入れる
             particles.push(new Particle(this.position.x, this.position.y, this.color, size, i));
         }
@@ -270,46 +356,48 @@ class Particle {
     
     // 移動
     move() {
-        // 空気抵抗
-        this.velocity.mult(0.96);
+      // 空気抵抗
+      this.velocity.mult(0.96);
 
-       //! 差分をとって目的地へ向かうベクトルを作成
-       var diffX = positions[this.posID].x - this.position.x;
-       var diffY = positions[this.posID].y - this.position.y;
-       var vec2target = createVector(diffX, diffY);
-       var diffLength = vec2target.mag();
+      // 差分をとって目的地へ向かうベクトルを作成
+      var diffX = positionsArray[judge][this.posID].x - this.position.x;
+      var diffY = positionsArray[judge][this.posID].y - this.position.y;
+      var vec2target = createVector(diffX, diffY);
+      var diffLength = vec2target.mag();
+      
             
-        // --- 目的地に向かう ---
-        //  目的地に到達したら
-        if (diffLength < 10.0)
-        {
-          var size = random(1.0, 2.0);
-          lastParticles.push(new LastParticle(this.position.x, this.position.y, this.color, size));
-          // 自身を消す
-          this.lifetime = 0;
-        }
-        else // 目的地に向かってる最中
-        {
-          //! 係数
-          var k = 0.0003;
-          this.velocity.x += vec2target.x * k;
-          this.velocity.y += vec2target.y * k;
-          // 重力で粒の速度が変化する
-          this.velocity.y += 0.015; 
-        }
+      // --- 目的地に向かう ---
+      //  目的地に到達したら
+      if (diffLength < 10.0)
+      {
+        var size = random(1.0, 2.0);
+        lastParticles.push(new LastParticle(this.position.x, this.position.y, this.color, size));
+        // 自身を消す
+        this.lifetime = 0;
         
-        // 速度が0に近づいたら
-        if (this.velocity.mag() < 0.05)
+      }
+      else // 目的地に向かってる最中
+      {
+        //! 係数
+        var k = 0.0003;
+        this.velocity.x += vec2target.x * k;
+        this.velocity.y += vec2target.y * k;
+        // 重力で粒の速度が変化する
+        this.velocity.y += 0.015; 
+      }
+        
+      // 速度が0に近づいたら
+      if (this.velocity.mag() < 0.05)
+      {
+        // 新しく小さな花火を打ち上げる
+        // 花火の大きさ（爆発の強さ）をランダムで決める
+        for (var i = 0; i < 10; i++)
         {
-          // 新しく小さな花火を打ち上げる
-          // 花火の大きさ（爆発の強さ）をランダムで決める
-          for (var i = 0; i < 10; i++)
-          {
-            var size = random(0.5, 1.5);
-            lastParticles.push(new LastParticle(this.position.x, this.position.y, this.color, size));
-            this.lifetime = 0.0;
-          } 
-        }
+          var size = random(0.5, 1.5);
+          lastParticles.push(new LastParticle(this.position.x, this.position.y, this.color, size));
+          this.lifetime = 0.0;
+        } 
+      }
 
         // 速度で座標が変化する
         this.position.add(this.velocity);
