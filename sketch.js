@@ -21,7 +21,7 @@ var isInitFinish;
 var photoImage;
 
 var count = 0;
-var stepSize = 8;
+var stepSize = 6;
 
 var positions = [];
 var judge = 0;
@@ -104,11 +104,6 @@ function timeIt() {
 
 function draw() {
   
-  if(count%5==0){
-    launch = true;
-    print("ここ");
-  }
-  
   if (isInitFinish)
   {
   
@@ -128,11 +123,14 @@ function draw() {
     */
     
     // たまに花火を打ち上げる（1000回のうち6回の確率）
-    if (random(1000)<1) {
+    if(!launch){
+      if (random(1000) < 6) {
         // 花火クラスからnewで花火を新しく作って配列に追加する
         fireworks.push(new Firework());
-        launch = false;
+        launch = true;
+      }
     }
+
     
     // 花火の本体の数だけ処理する
     for (var i = 0; i < fireworks.length; i++) {
@@ -185,7 +183,7 @@ class Firework {
     // 初期化（constructor＝コンストラクター＝建設者）
     constructor() {
         // 打ち上がり始める座標をランダムに決める
-        this.position = createVector(random(width), height - 100);
+        this.position = createVector(width -10, height - 100);
         // 打ち上げる速度をランダムに決める
         this.velocityY = random(-4.0, -4.8);
         // 色をランダムに決める
@@ -221,7 +219,10 @@ class Firework {
     explode() {
         // モードを「explode」に変える
         this.mode = 'explode';
+        launch = false;
         
+
+
         // 花火の大きさ（爆発の強さ）をランダムで決める
         var size = random(3.0, 6.0);
         // 花火の粒を大量に作る
