@@ -258,12 +258,12 @@ function draw() {
     // 補足テキストの表示
     fill(255);
     
-    text("Click [R] →", width - 170, 100);
-    text("Click [L] →", width - 170, 300);
-    text("Click [C] →", width - 170, 500);
+    text("Click [R] → ", width - 170, 100);
+    text("Click [L] → ", width - 170, 300);
+    text("Click [C] → ", width - 170, 500);
     
     textSize(25);
-
+    
   }
 }
 
