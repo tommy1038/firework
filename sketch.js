@@ -334,7 +334,7 @@ class Firework {
 // 花火の粒のクラス
 class Particle {
     // 初期化（constructor＝コンストラクター＝建設者）
-    constructor(x, y, color, size, _posID, positions) {
+    constructor(x, y, color, size, _posID, targets) {
         // 粒子ごとに固有のIDを与える
         this.posID = _posID;
 
@@ -354,7 +354,7 @@ class Particle {
         this.lifetime = random(600, 900);
       
         // 目的地の代入
-        this.positions = positions;
+        this.targets = targets;
     }
     
     // 移動
@@ -363,8 +363,8 @@ class Particle {
       this.velocity.mult(0.96);
 
       // 差分をとって目的地へ向かうベクトルを作成
-      var diffX = this.positions[this.posID].x - this.position.x;
-      var diffY = this.positions[this.posID].y - this.position.y;
+      var diffX = this.targets[this.posID].x - this.position.x;
+      var diffY = this.targets[this.posID].y - this.position.y;
       var vec2target = createVector(diffX, diffY);
       var diffLength = vec2target.mag();
       
