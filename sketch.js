@@ -158,6 +158,7 @@ function setup() {
   // timer処理(確認用)
   timer = createP("timer");
   setInterval(timeIt, 1000);
+  
 }
 
 function draw() {
@@ -252,7 +253,17 @@ function draw() {
             // 花火の粒を配列から消す
             lastParticles.splice(i, 1);
         }
-    } 
+    }
+    
+    // 補足テキストの表示
+    fill(255);
+    
+    text("Click [R] →", width - 170, 100);
+    text("Click [L] →", width - 170, 300);
+    text("Click [C] →", width - 170, 500);
+    
+    textSize(25);
+
   }
 }
 
