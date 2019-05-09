@@ -314,7 +314,7 @@ class Firework {
         var tempFireLength = fireLengthArray[judge];
         for (var i = 0; i < tempFireLength; i++) {
             // 花火本体の座標と色を使って花火の粒を作り配列に入れる
-            particles.push(new Particle(this.position.x, this.position.y, this.color, size, i));
+            particles.push(new Particle(this.position.x, this.position.y, this.color, size, i,positionsArray[judge]));
         }
         
         // 爆発の音を鳴らす
@@ -334,7 +334,7 @@ class Firework {
 // 花火の粒のクラス
 class Particle {
     // 初期化（constructor＝コンストラクター＝建設者）
-    constructor(x, y, color, size, _posID) {
+    constructor(x, y, color, size, _posID, positions) {
         // 粒子ごとに固有のIDを与える
         this.posID = _posID;
 
@@ -352,6 +352,9 @@ class Particle {
 
         // 花火の粒が表示される時間をランダムに決める
         this.lifetime = random(600, 900);
+      
+        // 目的地の代入
+        this.positions = positions;
     }
     
     // 移動
@@ -360,8 +363,8 @@ class Particle {
       this.velocity.mult(0.96);
 
       // 差分をとって目的地へ向かうベクトルを作成
-      var diffX = positionsArray[judge][this.posID].x - this.position.x;
-      var diffY = positionsArray[judge][this.posID].y - this.position.y;
+      var diffX = this.positions[this.posID].x - this.position.x;
+      var diffY = this.positions[this.posID].y - this.position.y;
       var vec2target = createVector(diffX, diffY);
       var diffLength = vec2target.mag();
       
